@@ -751,6 +751,11 @@
                 <strong>ℹ️ Hướng dẫn:</strong> Nhập trọng số (%) cho mỗi ô tương ứng. Tổng trọng số mỗi cột (mỗi CLO) phải bằng 100%.
             </div>
 
+            <!-- Debug button -->
+            <div class="button-group" style="margin-bottom: 15px;">
+                <button class="secondary" onclick="debugData()">🔍 Kiểm tra dữ liệu (Debug)</button>
+            </div>
+
             <div class="table-container">
                 <table id="matrixTable">
                     <thead>
@@ -856,7 +861,7 @@
                 }
             });
 
-            // Update displays when switching
+            // Update displays when switching - use setTimeout to ensure DOM is ready
             if (index === 3) {
                 // Debug info khi chuyển tab Ma trận
                 console.log('Switching to Matrix tab');
@@ -864,10 +869,22 @@
                 console.log('Assessment count:', appData.assessments.length);
                 console.log('CLO list:', appData.cloList);
                 console.log('Assessment list:', appData.assessments);
-                renderMatrix();
+                
+                // Đợi DOM render xong rồi mới gọi renderMatrix
+                setTimeout(() => {
+                    renderMatrix();
+                }, 50);
             }
-            if (index === 4) renderScoreTable();
-            if (index === 5) displayResults();
+            if (index === 4) {
+                setTimeout(() => {
+                    renderScoreTable();
+                }, 50);
+            }
+            if (index === 5) {
+                setTimeout(() => {
+                    displayResults();
+                }, 50);
+            }
         }
 
         // Save thong tin
@@ -1031,6 +1048,18 @@
 
         // Render Matrix
         function renderMatrix() {
+            // Kiểm tra DOM elements tồn tại
+            const header = document.getElementById('matrixHeader');
+            const body = document.getElementById('matrixBody');
+            const footer = document.getElementById('matrixFooter');
+            
+            if (!header || !body || !footer) {
+                console.error('Matrix DOM elements not found! Retrying...');
+                // Thử lại sau 100ms
+                setTimeout(renderMatrix, 100);
+                return;
+            }
+
             // Debug: kiểm tra dữ liệu
             if (appData.cloList.length === 0 || appData.assessments.length === 0) {
                 const debugMsg = `
@@ -1063,14 +1092,12 @@
             });
 
             // Header
-            const header = document.getElementById('matrixHeader');
             header.innerHTML = `
                 <th>Bài đánh giá</th>
                 ${appData.cloList.map(clo => `<th>${clo.code}<br><small>${clo.expectation}%</small></th>`).join('')}
             `;
 
             // Body
-            const body = document.getElementById('matrixBody');
             body.innerHTML = appData.assessments.map(assess => `
                 <tr>
                     <td style="font-weight: 600;">${assess.code}<br><small>${assess.name}</small></td>
@@ -1090,7 +1117,6 @@
             `).join('');
 
             // Footer (totals)
-            const footer = document.getElementById('matrixFooter');
             const totals = appData.cloList.map(clo => {
                 const sum = appData.assessments.reduce((total, assess) => 
                     total + (parseFloat(appData.matrix[assess.code][clo.code]) || 0), 0);
@@ -1106,12 +1132,62 @@
                     ${totals}
                 </tr>
             `;
+            
+            console.log('Matrix rendered successfully!');
         }
 
         // Update matrix
         function updateMatrix(assessCode, cloCode, value) {
             appData.matrix[assessCode][cloCode] = parseFloat(value) || 0;
             renderMatrix();
+        }
+
+        // Debug function
+        function debugData() {
+            const debugInfo = `
+=== THÔNG TIN DEBUG ===
+
+1. SỐ LƯỢNG DỮ LIỆU:
+   - CLO: ${appData.cloList.length}
+   - Bài đánh giá: ${appData.assessments.length}
+   - Sinh viên: ${appData.students.length}
+
+2. DANH SÁCH CLO:
+${appData.cloList.map((clo, i) => `   [${i}] ${clo.code} - ${clo.description} (Kỳ vọng: ${clo.expectation}%)`).join('\n') || '   (Không có CLO nào)'}
+
+3. DANH SÁCH BÀI ĐÁNH GIÁ:
+${appData.assessments.map((a, i) => `   [${i}] ${a.code} - ${a.name} (Ngưỡng: ${a.threshold})`).join('\n') || '   (Không có bài đánh giá nào)'}
+
+4. MA TRẬN:
+   Số keys: ${Object.keys(appData.matrix).length}
+   ${Object.keys(appData.matrix).length > 0 ? 'Chi tiết: ' + JSON.stringify(appData.matrix, null, 2) : ''}
+
+5. TOÀN BỘ appData:
+${JSON.stringify(appData, null, 2)}
+            `;
+
+            console.log(debugInfo);
+            
+            alert(`ĐÃ IN THÔNG TIN DEBUG VÀO CONSOLE!\n\nNhấn F12 để mở Console và xem chi tiết.\n\nTóm tắt:\n- CLO: ${appData.cloList.length}\n- Bài đánh giá: ${appData.assessments.length}\n- Sinh viên: ${appData.students.length}`);
+            
+            // Also show in modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <div class="modal-title">🔍 Thông tin Debug</div>
+                        <span class="close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
+                    </div>
+                    <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; overflow: auto; max-height: 500px; font-size: 12px;">${debugInfo}</pre>
+                    <div class="button-group">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()">Đóng</button>
+                        <button class="secondary" onclick="navigator.clipboard.writeText(\`${debugInfo.replace(/`/g, '\\`')}\`); showAlert('Đã copy vào clipboard!', 'success')">📋 Copy</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         // Validate matrix
