@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá Chuẩn đầu ra Học phần</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #d5dbdb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #667eea;
+            font-size: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Card styles */
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        /* CLO/Assessment Item */
+        .item-list {
+            margin-top: 15px;
+        }
+
+        .item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .item-code {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 15px;
+        }
+
+        .item-desc {
+            color: #555;
+            font-size: 13px;
+        }
+
+        .item-meta {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #95a5a6;
+        }
+
+        button.secondary:hover {
+            background: #7f8c8d;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        button.success {
+            background: #27ae60;
+        }
+
+        button.success:hover {
+            background: #229954;
+        }
+
+        button.small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+        }
+
+        td:first-child,
+        th:first-child {
+            font-weight: 600;
+            background: #f8f9fa;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        th:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            z-index: 15;
+        }
+
+        input[type="number"].small-input {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Alert messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        /* Result cards */
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .result-card.fail {
+            border-left-color: #e74c3c;
+        }
+
+        .result-header {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .result-card.fail .result-value {
+            color: #e74c3c;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.low {
+            background: linear-gradient(90deg, #e74c3c, #ec7063);
+        }
+
+        .progress-fill.medium {
+            background: linear-gradient(90deg, #f39c12, #f8b739);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .close {
+            font-size: 32px;
+            font-weight: bold;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+            transform: rotate(90deg);
+        }
+
+        /* File upload */
+        .file-upload {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #e3f2fd;
+            border-color: #5568d3;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 15px;
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab {
+                white-space: nowrap;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Đánh giá Chuẩn đầu ra Học phần</h1>
+        <div class="subtitle">Phương pháp đánh giá theo tỷ lệ trọng số đạt chuẩn</div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">📋 Thông tin HP</button>
+            <button class="tab" onclick="switchTab(1)">🎯 Quản lý CLO</button>
+            <button class="tab" onclick="switchTab(2)">📝 Bài đánh giá</button>
+            <button class="tab" onclick="switchTab(3)">🔗 Ma trận CLO</button>
+            <button class="tab" onclick="switchTab(4)">📊 Nhập điểm</button>
+            <button class="tab" onclick="switchTab(5)">📈 Kết quả</button>
+        </div>
+
+        <!-- Tab 1: Thông tin học phần -->
+        <div class="tab-content active">
+            <h2>I. Thông tin Học phần</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Mã học phần:</label>
+                    <input type="text" id="maHP" placeholder="VD: SPHN123456">
+                </div>
+                <div class="form-group">
+                    <label>Tên học phần:</label>
+                    <input type="text" id="tenHP" placeholder="Nhập tên học phần">
+                </div>
+                <div class="form-group">
+                    <label>Lớp học phần:</label>
+                    <input type="text" id="lopHP" placeholder="VD: SPHN123456_01">
+                </div>
+                <div class="form-group">
+                    <label>Học kỳ:</label>
+                    <select id="hocKy">
+                        <option value="1">Học kỳ 1</option>
+                        <option value="2">Học kỳ 2</option>
+                        <option value="3">Học kỳ 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Năm học:</label>
+                    <input type="text" id="namHoc" placeholder="VD: 2024-2025">
+                </div>
+                <div class="form-group">
+                    <label>Ngành đào tạo:</label>
+                    <input type="text" id="nganh" placeholder="Nhập tên ngành">
+                </div>
+                <div class="form-group">
+                    <label>Khóa tuyển sinh:</label>
+                    <input type="text" id="khoa" placeholder="VD: 2023">
+                </div>
+                <div class="form-group">
+                    <label>Giảng viên:</label>
+                    <input type="text" id="giangVien" placeholder="Nhập tên giảng viên">
+                </div>
+            </div>
+            <div class="button-group">
+                <button onclick="saveThongTin()">💾 Lưu thông tin</button>
+                <button class="secondary" onclick="switchTab(1)">Tiếp theo: Quản lý CLO →</button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Quản lý CLO -->
+        <div class="tab-content">
+            <h2>II. Quản lý Chuẩn đầu ra Học phần (CLO)</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Thêm CLO mới</div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mã CLO:</label>
+                        <input type="text" id="cloCode" placeholder="VD: CLO1">
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả CLO:</label>
+                        <input type="text" id="cloDesc" placeholder="Nhập mô tả chuẩn đầu ra">
+                    </div>
+                    <div class="form-group">
+                        <label>Liên quan đến PI:</label>
+                        <input type="text" id="cloPi" placeholder="VD: PI1.1, PI2.3">
+                    </div>
+                    <div class="form-group">
+                        <label>Kỳ vọng đạt (% trọng số):</label>
+                        <input type="number" id="cloExpectation" min="0" max="100" step="1" placeholder="VD: 70">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button onclick="addCLO()">➕ Thêm CLO</button>
+                </div>
+            </div>
+
+            <div class="item-list" id="cloList"></div>
+
+            <div class="button-group">
+                <button class="secondary" onclick="switchTab(0)">← Quay lại</button>
+                <button onclick="switchTab(2)">Tiếp theo: Bài đánh giá →</button>
+            </div>
+        </div>
+
+        <!-- Tab 3: Bài đánh giá -->
+        <div class="tab-content">
+            <h2>III. Quản lý Bài đánh giá</h2>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Thêm bài đánh giá mới</div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Mã bài đánh giá:</label>
+                        <input type="text" id="assessCode" placeholder="VD: A1, B1">
+                    </div>
+                    <div class="form-group">
+                        <label>Tên bài đánh giá:</label>
+                        <input type="text" id="assessName" placeholder="VD: Bài tập cá nhân">
+                    </div>
+                    <div class="form-group">
+                        <label>Ngưỡng đạt (thang 10):</label>
+                        <input type="number" id="assessThreshold" min="0" max="10" step="0.1" placeholder="VD: 5.0">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button onclick="addAssessment()">➕ Thêm bài đánh giá</button>
+                </div>
+            </div>
+
+            <div class="item-list" id="assessmentList"></div>
+
+            <div class="button-group">
+                <button class="secondary" onclick="switchTab(1)">← Quay lại</button>
+                <button onclick="switchTab(3)">Tiếp theo: Ma trận CLO →</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Ma trận CLO -->
+        <div class="tab-content">
+            <h2>IV. Ma trận Đánh giá CLO - Assessment</h2>
+            
+            <div class="alert alert-info">
+                <strong>ℹ️ Hướng dẫn:</strong> Nhập trọng số (%) cho mỗi ô tương ứng. Tổng trọng số mỗi cột (mỗi CLO) phải bằng 100%.
+            </div>
+
+            <div class="table-container">
+                <table id="matrixTable">
+                    <thead>
+                        <tr id="matrixHeader"></tr>
+                    </thead>
+                    <tbody id="matrixBody"></tbody>
+                    <tfoot id="matrixFooter"></tfoot>
+                </table>
+            </div>
+
+            <div class="button-group">
+                <button class="secondary" onclick="switchTab(2)">← Quay lại</button>
+                <button onclick="validateMatrix()">✓ Kiểm tra ma trận</button>
+                <button onclick="switchTab(4)">Tiếp theo: Nhập điểm →</button>
+            </div>
+        </div>
+
+        <!-- Tab 5: Nhập điểm -->
+        <div class="tab-content">
+            <h2>V. Nhập điểm Sinh viên</h2>
+
+            <div class="alert alert-info">
+                <strong>ℹ️ Chọn phương thức nhập điểm:</strong> Nhập thủ công hoặc Import từ file Excel
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Import điểm từ Excel</div>
+                </div>
+                <div class="file-upload" onclick="document.getElementById('excelFile').click()">
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" onchange="importExcel(event)">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #667eea;">Nhấp để chọn file Excel</div>
+                    <div style="font-size: 13px; color: #7f8c8d; margin-top: 5px;">Hỗ trợ định dạng .xlsx, .xls</div>
+                </div>
+                <div id="fileInfo" class="file-info hidden"></div>
+                <div class="button-group">
+                    <button onclick="downloadTemplate()">📥 Tải template Excel</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Hoặc nhập thủ công</div>
+                    <button class="small" onclick="addStudentRow()">➕ Thêm sinh viên</button>
+                </div>
+                <div class="table-container">
+                    <table id="scoreTable">
+                        <thead id="scoreTableHead"></thead>
+                        <tbody id="scoreTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="secondary" onclick="switchTab(3)">← Quay lại</button>
+                <button class="success" onclick="calculateResults()">🧮 Tính toán kết quả</button>
+                <button onclick="switchTab(5)">Xem kết quả →</button>
+            </div>
+        </div>
+
+        <!-- Tab 6: Kết quả -->
+        <div class="tab-content">
+            <h2>VI. Kết quả Đánh giá CLO</h2>
+            
+            <div id="resultsSummary"></div>
+            <div id="resultsDetail"></div>
+
+            <div class="button-group">
+                <button class="secondary" onclick="switchTab(4)">← Quay lại</button>
+                <button class="success" onclick="exportExcel()">📊 Xuất Excel</button>
+                <button class="secondary" onclick="saveData()">💾 Lưu dữ liệu</button>
+                <button class="secondary" onclick="loadData()">📂 Tải dữ liệu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include SheetJS for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script>
+        // Global data structure
+        let appData = {
+            thongTin: {},
+            cloList: [],
+            assessments: [],
+            matrix: {},
+            students: []
+        };
+
+        // Tab switching
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                    contents[i].classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                    contents[i].classList.remove('active');
+                }
+            });
+
+            // Update displays when switching
+            if (index === 3) {
+                // Debug info khi chuyển tab Ma trận
+                console.log('Switching to Matrix tab');
+                console.log('CLO count:', appData.cloList.length);
+                console.log('Assessment count:', appData.assessments.length);
+                console.log('CLO list:', appData.cloList);
+                console.log('Assessment list:', appData.assessments);
+                renderMatrix();
+            }
+            if (index === 4) renderScoreTable();
+            if (index === 5) displayResults();
+        }
+
+        // Save thong tin
+        function saveThongTin() {
+            appData.thongTin = {
+                maHP: document.getElementById('maHP').value,
+                tenHP: document.getElementById('tenHP').value,
+                lopHP: document.getElementById('lopHP').value,
+                hocKy: document.getElementById('hocKy').value,
+                namHoc: document.getElementById('namHoc').value,
+                nganh: document.getElementById('nganh').value,
+                khoa: document.getElementById('khoa').value,
+                giangVien: document.getElementById('giangVien').value
+            };
+            showAlert('Đã lưu thông tin học phần!', 'success');
+        }
+
+        // Add CLO
+        function addCLO() {
+            const code = document.getElementById('cloCode').value.trim();
+            const desc = document.getElementById('cloDesc').value.trim();
+            const pi = document.getElementById('cloPi').value.trim();
+            const expectation = parseFloat(document.getElementById('cloExpectation').value);
+
+            if (!code || !desc || !expectation) {
+                showAlert('Vui lòng nhập đầy đủ thông tin CLO!', 'warning');
+                return;
+            }
+
+            if (expectation < 0 || expectation > 100) {
+                showAlert('Kỳ vọng phải từ 0-100%!', 'warning');
+                return;
+            }
+
+            // Check duplicate
+            if (appData.cloList.find(c => c.code === code)) {
+                showAlert('Mã CLO đã tồn tại!', 'warning');
+                return;
+            }
+
+            appData.cloList.push({
+                code,
+                description: desc,
+                pi: pi.split(',').map(p => p.trim()).filter(p => p),
+                expectation
+            });
+
+            renderCLOList();
+            
+            // Clear inputs
+            document.getElementById('cloCode').value = '';
+            document.getElementById('cloDesc').value = '';
+            document.getElementById('cloPi').value = '';
+            document.getElementById('cloExpectation').value = '';
+
+            showAlert(`Đã thêm ${code}!`, 'success');
+        }
+
+        // Render CLO list
+        function renderCLOList() {
+            const container = document.getElementById('cloList');
+            if (appData.cloList.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Chưa có CLO nào. Vui lòng thêm CLO.</div>';
+                return;
+            }
+
+            container.innerHTML = appData.cloList.map((clo, index) => `
+                <div class="item">
+                    <div class="item-info">
+                        <div class="item-code">${clo.code}</div>
+                        <div class="item-desc">${clo.description}</div>
+                        <div class="item-meta">
+                            PI: ${clo.pi.join(', ') || 'Chưa có'} | 
+                            Kỳ vọng: ${clo.expectation}% trọng số
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="small danger" onclick="deleteCLO(${index})">🗑️ Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Delete CLO
+        function deleteCLO(index) {
+            if (confirm('Xác nhận xóa CLO này?')) {
+                appData.cloList.splice(index, 1);
+                renderCLOList();
+                showAlert('Đã xóa CLO!', 'info');
+            }
+        }
+
+        // Add Assessment
+        function addAssessment() {
+            const code = document.getElementById('assessCode').value.trim();
+            const name = document.getElementById('assessName').value.trim();
+            const threshold = parseFloat(document.getElementById('assessThreshold').value);
+
+            if (!code || !name || !threshold) {
+                showAlert('Vui lòng nhập đầy đủ thông tin bài đánh giá!', 'warning');
+                return;
+            }
+
+            if (threshold < 0 || threshold > 10) {
+                showAlert('Ngưỡng đạt phải từ 0-10!', 'warning');
+                return;
+            }
+
+            // Check duplicate
+            if (appData.assessments.find(a => a.code === code)) {
+                showAlert('Mã bài đánh giá đã tồn tại!', 'warning');
+                return;
+            }
+
+            appData.assessments.push({
+                code,
+                name,
+                threshold
+            });
+
+            renderAssessmentList();
+            
+            // Clear inputs
+            document.getElementById('assessCode').value = '';
+            document.getElementById('assessName').value = '';
+            document.getElementById('assessThreshold').value = '';
+
+            showAlert(`Đã thêm ${code}!`, 'success');
+        }
+
+        // Render Assessment list
+        function renderAssessmentList() {
+            const container = document.getElementById('assessmentList');
+            if (appData.assessments.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Chưa có bài đánh giá nào. Vui lòng thêm bài đánh giá.</div>';
+                return;
+            }
+
+            container.innerHTML = appData.assessments.map((assess, index) => `
+                <div class="item">
+                    <div class="item-info">
+                        <div class="item-code">${assess.code}</div>
+                        <div class="item-desc">${assess.name}</div>
+                        <div class="item-meta">Ngưỡng đạt: ${assess.threshold.toFixed(1)} điểm</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="small danger" onclick="deleteAssessment(${index})">🗑️ Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Delete Assessment
+        function deleteAssessment(index) {
+            if (confirm('Xác nhận xóa bài đánh giá này?')) {
+                appData.assessments.splice(index, 1);
+                renderAssessmentList();
+                showAlert('Đã xóa bài đánh giá!', 'info');
+            }
+        }
+
+        // Render Matrix
+        function renderMatrix() {
+            // Debug: kiểm tra dữ liệu
+            if (appData.cloList.length === 0 || appData.assessments.length === 0) {
+                const debugMsg = `
+                    <tr><td colspan="100%" style="text-align:center; padding:30px;">
+                        <div style="color: #e74c3c; font-size: 16px; margin-bottom: 15px;">
+                            ⚠️ Chưa đủ dữ liệu để hiển thị ma trận
+                        </div>
+                        <div style="font-size: 14px; color: #7f8c8d;">
+                            Số CLO: ${appData.cloList.length}<br>
+                            Số Bài đánh giá: ${appData.assessments.length}<br><br>
+                            ${appData.cloList.length === 0 ? '❌ Vui lòng thêm CLO ở Tab 2<br>' : ''}
+                            ${appData.assessments.length === 0 ? '❌ Vui lòng thêm Bài đánh giá ở Tab 3<br>' : ''}
+                        </div>
+                    </td></tr>
+                `;
+                document.getElementById('matrixTable').innerHTML = debugMsg;
+                return;
+            }
+
+            // Initialize matrix - always sync with current CLO and assessments
+            appData.assessments.forEach(assess => {
+                if (!appData.matrix[assess.code]) {
+                    appData.matrix[assess.code] = {};
+                }
+                appData.cloList.forEach(clo => {
+                    if (appData.matrix[assess.code][clo.code] === undefined) {
+                        appData.matrix[assess.code][clo.code] = 0;
+                    }
+                });
+            });
+
+            // Header
+            const header = document.getElementById('matrixHeader');
+            header.innerHTML = `
+                <th>Bài đánh giá</th>
+                ${appData.cloList.map(clo => `<th>${clo.code}<br><small>${clo.expectation}%</small></th>`).join('')}
+            `;
+
+            // Body
+            const body = document.getElementById('matrixBody');
+            body.innerHTML = appData.assessments.map(assess => `
+                <tr>
+                    <td style="font-weight: 600;">${assess.code}<br><small>${assess.name}</small></td>
+                    ${appData.cloList.map(clo => `
+                        <td>
+                            <input type="number" 
+                                class="small-input" 
+                                min="0" 
+                                max="100" 
+                                step="1"
+                                value="${appData.matrix[assess.code][clo.code]}"
+                                onchange="updateMatrix('${assess.code}', '${clo.code}', this.value)"
+                                placeholder="%">
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('');
+
+            // Footer (totals)
+            const footer = document.getElementById('matrixFooter');
+            const totals = appData.cloList.map(clo => {
+                const sum = appData.assessments.reduce((total, assess) => 
+                    total + (parseFloat(appData.matrix[assess.code][clo.code]) || 0), 0);
+                const isValid = Math.abs(sum - 100) < 0.01;
+                return `<td style="font-weight: 700; background: ${isValid ? '#d4edda' : '#f8d7da'}; color: ${isValid ? '#155724' : '#721c24'};">
+                    ${sum.toFixed(1)}%
+                </td>`;
+            }).join('');
+
+            footer.innerHTML = `
+                <tr>
+                    <th>Tổng</th>
+                    ${totals}
+                </tr>
+            `;
+        }
+
+        // Update matrix
+        function updateMatrix(assessCode, cloCode, value) {
+            appData.matrix[assessCode][cloCode] = parseFloat(value) || 0;
+            renderMatrix();
+        }
+
+        // Validate matrix
+        function validateMatrix() {
+            let valid = true;
+            const errors = [];
+
+            appData.cloList.forEach(clo => {
+                const sum = appData.assessments.reduce((total, assess) => 
+                    total + (parseFloat(appData.matrix[assess.code][clo.code]) || 0), 0);
+                
+                if (Math.abs(sum - 100) > 0.01) {
+                    valid = false;
+                    errors.push(`${clo.code}: ${sum.toFixed(1)}% (phải bằng 100%)`);
+                }
+            });
+
+            if (valid) {
+                showAlert('✓ Ma trận hợp lệ! Tất cả CLO đều có tổng trọng số = 100%', 'success');
+            } else {
+                showAlert('⚠️ Ma trận chưa hợp lệ:\n' + errors.join('\n'), 'danger');
+            }
+
+            return valid;
+        }
+
+        // Render score table
+        function renderScoreTable() {
+            const thead = document.getElementById('scoreTableHead');
+            const tbody = document.getElementById('scoreTableBody');
+
+            if (appData.assessments.length === 0) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:30px;">Vui lòng thêm bài đánh giá trước</td></tr>';
+                return;
+            }
+
+            // Header
+            thead.innerHTML = `
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ và tên</th>
+                    ${appData.assessments.map(a => `<th>${a.code}<br><small>(≥${a.threshold})</small></th>`).join('')}
+                    <th>Thao tác</th>
+                </tr>
+            `;
+
+            // Body
+            if (appData.students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:20px;">Chưa có sinh viên. Nhấn "Thêm sinh viên" hoặc Import Excel</td></tr>';
+            } else {
+                tbody.innerHTML = appData.students.map((student, index) => `
+                    <tr>
+                        <td>
+                            <input type="text" 
+                                value="${student.mssv}" 
+                                onchange="updateStudent(${index}, 'mssv', this.value)"
+                                style="width: 100px; padding: 6px;">
+                        </td>
+                        <td>
+                            <input type="text" 
+                                value="${student.hoTen}" 
+                                onchange="updateStudent(${index}, 'hoTen', this.value)"
+                                style="width: 200px; padding: 6px;">
+                        </td>
+                        ${appData.assessments.map(assess => `
+                            <td>
+                                <input type="number" 
+                                    class="small-input"
+                                    min="0" 
+                                    max="10" 
+                                    step="0.1"
+                                    value="${student.scores[assess.code] || ''}"
+                                    onchange="updateStudent(${index}, 'score_${assess.code}', this.value)">
+                            </td>
+                        `).join('')}
+                        <td>
+                            <button class="small danger" onclick="deleteStudent(${index})">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Add student row
+        function addStudentRow() {
+            const newStudent = {
+                mssv: '',
+                hoTen: '',
+                scores: {}
+            };
+            
+            appData.assessments.forEach(assess => {
+                newStudent.scores[assess.code] = '';
+            });
+
+            appData.students.push(newStudent);
+            renderScoreTable();
+        }
+
+        // Update student
+        function updateStudent(index, field, value) {
+            if (field === 'mssv') {
+                appData.students[index].mssv = value;
+            } else if (field === 'hoTen') {
+                appData.students[index].hoTen = value;
+            } else if (field.startsWith('score_')) {
+                const assessCode = field.replace('score_', '');
+                appData.students[index].scores[assessCode] = parseFloat(value) || 0;
+            }
+        }
+
+        // Delete student
+        function deleteStudent(index) {
+            if (confirm('Xóa sinh viên này?')) {
+                appData.students.splice(index, 1);
+                renderScoreTable();
+            }
+        }
+
+        // Download template Excel
+        function downloadTemplate() {
+            if (appData.assessments.length === 0) {
+                showAlert('Vui lòng thêm bài đánh giá trước!', 'warning');
+                return;
+            }
+
+            const ws_data = [
+                ['MSSV', 'Họ và tên', ...appData.assessments.map(a => `${a.code} (≥${a.threshold})`)],
+                ['2051001', 'Nguyễn Văn A', ...appData.assessments.map(() => '')],
+                ['2051002', 'Trần Thị B', ...appData.assessments.map(() => '')],
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Điểm');
+            
+            XLSX.writeFile(wb, `Template_Diem_${appData.thongTin.maHP || 'HP'}.xlsx`);
+            showAlert('Đã tải template Excel!', 'success');
+        }
+
+        // Import Excel
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                    // Parse data (skip header row)
+                    const students = [];
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (!row[0]) continue; // Skip empty rows
+
+                        const student = {
+                            mssv: row[0].toString(),
+                            hoTen: row[1] || '',
+                            scores: {}
+                        };
+
+                        appData.assessments.forEach((assess, j) => {
+                            student.scores[assess.code] = parseFloat(row[j + 2]) || 0;
+                        });
+
+                        students.push(student);
+                    }
+
+                    appData.students = students;
+                    renderScoreTable();
+                    
+                    document.getElementById('fileInfo').classList.remove('hidden');
+                    document.getElementById('fileInfo').textContent = `✓ Đã import ${students.length} sinh viên`;
+                    showAlert(`Đã import ${students.length} sinh viên!`, 'success');
+                } catch (error) {
+                    showAlert('Lỗi khi đọc file Excel: ' + error.message, 'danger');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Calculate results
+        function calculateResults() {
+            if (!validateMatrix()) {
+                showAlert('Vui lòng kiểm tra ma trận trước khi tính toán!', 'warning');
+                return;
+            }
+
+            if (appData.students.length === 0) {
+                showAlert('Chưa có dữ liệu sinh viên!', 'warning');
+                return;
+            }
+
+            // Calculate for each student
+            appData.students.forEach(student => {
+                student.cloResults = {};
+
+                appData.cloList.forEach(clo => {
+                    const details = [];
+                    let totalWeightAchieved = 0;
+                    let totalWeight = 0;
+                    let missingData = [];
+                    let hasAllData = true;
+
+                    appData.assessments.forEach(assess => {
+                        const weight = appData.matrix[assess.code][clo.code] || 0;
+                        if (weight > 0) {
+                            totalWeight += weight;
+                            const score = student.scores[assess.code];
+                            
+                            // Kiểm tra dữ liệu thiếu: score phải là số hợp lệ (không phải undefined, null, '', hoặc NaN)
+                            const hasScore = score !== undefined && score !== null && score !== '' && !isNaN(score);
+                            
+                            if (!hasScore) {
+                                hasAllData = false;
+                                missingData.push(assess.code);
+                            }
+                            
+                            const actualScore = hasScore ? parseFloat(score) : 0;
+                            const threshold = assess.threshold;
+                            const achieved = hasScore && actualScore >= threshold;
+
+                            details.push({
+                                bai: assess.code,
+                                diem: hasScore ? actualScore : null,
+                                nguong: threshold,
+                                dat: achieved,
+                                trongSo: weight,
+                                thieuDuLieu: !hasScore
+                            });
+
+                            if (achieved) {
+                                totalWeightAchieved += weight;
+                            }
+                        }
+                    });
+
+                    // Nếu thiếu dữ liệu, không tính được CLO
+                    if (!hasAllData) {
+                        student.cloResults[clo.code] = {
+                            chiTiet: details,
+                            tyLeDat: null,
+                            ketLuan: 'Chưa đủ dữ liệu',
+                            missingData: missingData
+                        };
+                    } else {
+                        const tyLeDat = totalWeight > 0 ? (totalWeightAchieved / totalWeight * 100) : 0;
+                        const ketLuan = tyLeDat >= clo.expectation ? 'Đạt' : 'Chưa đạt';
+
+                        student.cloResults[clo.code] = {
+                            chiTiet: details,
+                            tyLeDat: tyLeDat,
+                            ketLuan: ketLuan,
+                            missingData: []
+                        };
+                    }
+                });
+            });
+
+            showAlert('Đã tính toán xong!', 'success');
+            switchTab(5);
+        }
+
+        // Display results
+        function displayResults() {
+            if (appData.students.length === 0 || !appData.students[0].cloResults) {
+                document.getElementById('resultsSummary').innerHTML = 
+                    '<div class="alert alert-warning">Chưa có kết quả. Vui lòng nhập điểm và tính toán.</div>';
+                document.getElementById('resultsDetail').innerHTML = '';
+                return;
+            }
+
+            // Summary by CLO
+            const summary = {};
+            appData.cloList.forEach(clo => {
+                // Chỉ đếm sinh viên có đủ dữ liệu
+                const studentsWithData = appData.students.filter(s => 
+                    s.cloResults[clo.code].ketLuan !== 'Chưa đủ dữ liệu'
+                );
+                
+                const studentsAchieved = studentsWithData.filter(s => 
+                    s.cloResults[clo.code].ketLuan === 'Đạt'
+                ).length;
+                
+                const studentsMissingData = appData.students.filter(s =>
+                    s.cloResults[clo.code].ketLuan === 'Chưa đủ dữ liệu'
+                ).length;
+                
+                const tyLeDatLop = studentsWithData.length > 0 
+                    ? (studentsAchieved / studentsWithData.length * 100) 
+                    : 0;
+                
+                const avgWeight = studentsWithData.length > 0
+                    ? studentsWithData.reduce((sum, s) => sum + s.cloResults[clo.code].tyLeDat, 0) / studentsWithData.length
+                    : 0;
+
+                summary[clo.code] = {
+                    soSVDat: studentsAchieved,
+                    soSVDuDuLieu: studentsWithData.length,
+                    soSVThieuDuLieu: studentsMissingData,
+                    tongSV: appData.students.length,
+                    tyLeDatLop: tyLeDatLop,
+                    avgWeight: avgWeight,
+                    kyVong: clo.expectation,
+                    ketLuan: studentsWithData.length === 0 
+                        ? 'Chưa đủ dữ liệu' 
+                        : (tyLeDatLop >= clo.expectation ? 'Đạt' : 'Chưa đạt')
+                };
+            });
+
+            // Render summary
+            const summaryHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📊 Tổng hợp kết quả đánh giá CLO</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>CLO</th>
+                                    <th>Kỳ vọng<br>tỷ lệ đạt (%)</th>
+                                    <th>Sinh viên<br>có đủ dữ liệu</th>
+                                    <th>Sinh viên<br>đạt</th>
+                                    <th>Tỷ lệ đạt<br>kỳ vọng (%)</th>
+                                    <th>Tỷ lệ TB<br>lớp (%)</th>
+                                    <th>Kết luận</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${appData.cloList.map(clo => {
+                                    const s = summary[clo.code];
+                                    const rowClass = s.ketLuan === 'Chưa đủ dữ liệu' 
+                                        ? 'style="background: #fff3cd;"'
+                                        : (s.ketLuan === 'Đạt' ? '' : 'style="background: #fee;"');
+                                    return `
+                                        <tr ${rowClass}>
+                                            <td style="font-weight: 700;">${clo.code}</td>
+                                            <td>≥${s.kyVong}%</td>
+                                            <td>
+                                                ${s.soSVDuDuLieu}/${s.tongSV}
+                                                ${s.soSVThieuDuLieu > 0 ? `<br><small style="color: #856404;">⚠️ ${s.soSVThieuDuLieu} SV thiếu dữ liệu</small>` : ''}
+                                            </td>
+                                            <td>${s.soSVDat}/${s.soSVDuDuLieu}</td>
+                                            <td><strong>${s.soSVDuDuLieu > 0 ? s.tyLeDatLop.toFixed(1) : 'N/A'}%</strong></td>
+                                            <td>${s.soSVDuDuLieu > 0 ? s.avgWeight.toFixed(1) : 'N/A'}%</td>
+                                            <td>
+                                                <span class="badge ${
+                                                    s.ketLuan === 'Đạt' ? 'badge-success' : 
+                                                    s.ketLuan === 'Chưa đủ dữ liệu' ? 'badge-warning' : 
+                                                    'badge-danger'
+                                                }">
+                                                    ${s.ketLuan}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ${Object.values(summary).some(s => s.soSVThieuDuLieu > 0) ? `
+                        <div class="alert alert-warning" style="margin-top: 15px;">
+                            <strong>⚠️ Lưu ý:</strong> Có sinh viên thiếu dữ liệu điểm. 
+                            Các CLO chỉ được tính trên những sinh viên có đầy đủ điểm các bài kiểm tra liên quan.
+                        </div>
+                    ` : ''}
+                    <div class="alert alert-info" style="margin-top: 15px;">
+                        <strong>📖 Giải thích các cột:</strong><br>
+                        • <strong>Kỳ vọng tỷ lệ đạt:</strong> Ngưỡng tối thiểu để sinh viên được coi là đạt CLO (do giảng viên đặt)<br>
+                        • <strong>Sinh viên có đủ dữ liệu:</strong> Số sinh viên có điểm đầy đủ các bài kiểm tra liên quan đến CLO<br>
+                        • <strong>Sinh viên đạt:</strong> Số sinh viên có tỷ lệ đạt ≥ Kỳ vọng<br>
+                        • <strong>Tỷ lệ đạt kỳ vọng:</strong> Phần trăm sinh viên đạt kỳ vọng so với tổng số sinh viên có đủ dữ liệu<br>
+                        • <strong>Tỷ lệ TB lớp:</strong> Trung bình tỷ lệ trọng số đạt được của cả lớp (chỉ tính sinh viên có đủ dữ liệu)
+                    </div>
+                </div>
+
+                <div class="result-grid">
+                    ${appData.cloList.map(clo => {
+                        const s = summary[clo.code];
+                        const progressClass = s.tyLeDatLop >= 80 ? '' : (s.tyLeDatLop >= 60 ? 'medium' : 'low');
+                        const isMissingData = s.ketLuan === 'Chưa đủ dữ liệu';
+                        
+                        return `
+                            <div class="result-card ${s.ketLuan === 'Chưa đạt' ? 'fail' : ''}">
+                                <div class="result-header">${clo.code}</div>
+                                ${isMissingData ? `
+                                    <div class="result-value" style="color: #856404;">N/A</div>
+                                    <div style="font-size: 13px; color: #856404; margin: 10px 0;">
+                                        ⚠️ Tất cả sinh viên đều thiếu dữ liệu
+                                    </div>
+                                ` : `
+                                    <div class="result-value">${s.tyLeDatLop.toFixed(1)}%</div>
+                                    <div style="font-size: 13px; color: #7f8c8d; margin: 5px 0;">
+                                        ${s.soSVDat}/${s.soSVDuDuLieu} sinh viên đạt
+                                        ${s.soSVThieuDuLieu > 0 ? `<br><small style="color: #856404;">⚠️ ${s.soSVThieuDuLieu} SV thiếu dữ liệu</small>` : ''}
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${progressClass}" style="width: ${s.tyLeDatLop}%">
+                                            ${s.tyLeDatLop.toFixed(0)}%
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 12px; color: #7f8c8d; margin-top: 8px;">
+                                        Kỳ vọng: ${s.kyVong}% | Tỷ lệ TB lớp: ${s.avgWeight.toFixed(1)}%
+                                    </div>
+                                `}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            document.getElementById('resultsSummary').innerHTML = summaryHTML;
+
+            // Detail table
+            const detailHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Chi tiết kết quả từng sinh viên</div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MSSV</th>
+                                    <th>Họ tên</th>
+                                    ${appData.cloList.map(clo => `<th>${clo.code}<br><small>Tỷ lệ đạt (%)</small></th>`).join('')}
+                                    <th>Tổng CLO đạt</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${appData.students.map(student => {
+                                    const totalCLOAchieved = appData.cloList.filter(clo => 
+                                        student.cloResults[clo.code].ketLuan === 'Đạt'
+                                    ).length;
+                                    
+                                    const totalCLOMissingData = appData.cloList.filter(clo =>
+                                        student.cloResults[clo.code].ketLuan === 'Chưa đủ dữ liệu'
+                                    ).length;
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${student.mssv}</td>
+                                            <td style="text-align: left;">${student.hoTen}</td>
+                                            ${appData.cloList.map(clo => {
+                                                const result = student.cloResults[clo.code];
+                                                
+                                                if (result.ketLuan === 'Chưa đủ dữ liệu') {
+                                                    return `
+                                                        <td style="background: #fff3cd; color: #856404; font-weight: 600;" title="Thiếu điểm: ${result.missingData.join(', ')}">
+                                                            N/A ⚠️
+                                                        </td>
+                                                    `;
+                                                }
+                                                
+                                                const bgColor = result.ketLuan === 'Đạt' ? '#d4edda' : '#f8d7da';
+                                                const textColor = result.ketLuan === 'Đạt' ? '#155724' : '#721c24';
+                                                return `
+                                                    <td style="background: ${bgColor}; color: ${textColor}; font-weight: 600;">
+                                                        ${result.tyLeDat.toFixed(1)}%
+                                                    </td>
+                                                `;
+                                            }).join('')}
+                                            <td style="font-weight: 700;">
+                                                ${totalCLOAchieved}/${appData.cloList.length}
+                                                ${totalCLOMissingData > 0 ? `<br><small style="color: #856404;">⚠️ ${totalCLOMissingData} CLO thiếu DL</small>` : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultsDetail').innerHTML = detailHTML;
+        }
+
+        // Export Excel
+        function exportExcel() {
+            if (appData.students.length === 0) {
+                showAlert('Chưa có dữ liệu để xuất!', 'warning');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // SHEET 1: Tổng hợp kết quả CLO của cả lớp
+            const summary = {};
+            appData.cloList.forEach(clo => {
+                const studentsWithData = appData.students.filter(s => 
+                    s.cloResults[clo.code].ketLuan !== 'Chưa đủ dữ liệu'
+                );
+                
+                const studentsAchieved = studentsWithData.filter(s => 
+                    s.cloResults[clo.code].ketLuan === 'Đạt'
+                ).length;
+                
+                const studentsMissingData = appData.students.filter(s =>
+                    s.cloResults[clo.code].ketLuan === 'Chưa đủ dữ liệu'
+                ).length;
+                
+                const tyLeDatLop = studentsWithData.length > 0 
+                    ? (studentsAchieved / studentsWithData.length * 100) 
+                    : 0;
+                
+                const avgWeight = studentsWithData.length > 0
+                    ? studentsWithData.reduce((sum, s) => sum + s.cloResults[clo.code].tyLeDat, 0) / studentsWithData.length
+                    : 0;
+
+                summary[clo.code] = {
+                    soSVDat: studentsAchieved,
+                    soSVDuDuLieu: studentsWithData.length,
+                    soSVThieuDuLieu: studentsMissingData,
+                    tongSV: appData.students.length,
+                    tyLeDatLop: tyLeDatLop,
+                    avgWeight: avgWeight,
+                    kyVong: clo.expectation,
+                    ketLuan: studentsWithData.length === 0 
+                        ? 'Chưa đủ dữ liệu' 
+                        : (tyLeDatLop >= clo.expectation ? 'Đạt' : 'Chưa đạt')
+                };
+            });
+
+            const summaryData = [
+                // Thông tin học phần
+                ['BÁO CÁO ĐÁNH GIÁ CHUẨN ĐẦU RA HỌC PHẦN'],
+                [''],
+                ['Mã học phần:', appData.thongTin.maHP || ''],
+                ['Tên học phần:', appData.thongTin.tenHP || ''],
+                ['Lớp học phần:', appData.thongTin.lopHP || ''],
+                ['Học kỳ:', appData.thongTin.hocKy || ''],
+                ['Năm học:', appData.thongTin.namHoc || ''],
+                ['Ngành đào tạo:', appData.thongTin.nganh || ''],
+                ['Khóa:', appData.thongTin.khoa || ''],
+                ['Giảng viên:', appData.thongTin.giangVien || ''],
+                ['Tổng số sinh viên:', appData.students.length],
+                [''],
+                // Header bảng tổng hợp
+                ['CLO', 'Mô tả', 'Kỳ vọng tỷ lệ đạt (%)', 'SV có đủ dữ liệu', 'SV đạt', 'Tỷ lệ đạt kỳ vọng (%)', 'Tỷ lệ TB lớp (%)', 'Kết luận'],
+                // Dữ liệu từng CLO
+                ...appData.cloList.map(clo => {
+                    const s = summary[clo.code];
+                    const cloInfo = appData.cloList.find(c => c.code === clo.code);
+                    return [
+                        clo.code,
+                        cloInfo.description,
+                        s.kyVong,
+                        `${s.soSVDuDuLieu}/${s.tongSV}`,
+                        `${s.soSVDat}/${s.soSVDuDuLieu}`,
+                        s.soSVDuDuLieu > 0 ? s.tyLeDatLop.toFixed(1) : 'N/A',
+                        s.soSVDuDuLieu > 0 ? s.avgWeight.toFixed(1) : 'N/A',
+                        s.ketLuan
+                    ];
+                }),
+                [''],
+                // Thống kê chung
+                ['THỐNG KÊ CHUNG'],
+                ['Tổng số CLO:', appData.cloList.length],
+                ['Số CLO đạt kỳ vọng:', Object.values(summary).filter(s => s.ketLuan === 'Đạt').length],
+                ['Số CLO chưa đạt:', Object.values(summary).filter(s => s.ketLuan === 'Chưa đạt').length],
+                ['Số CLO thiếu dữ liệu:', Object.values(summary).filter(s => s.ketLuan === 'Chưa đủ dữ liệu').length],
+            ];
+
+            const ws_summary = XLSX.utils.aoa_to_sheet(summaryData);
+            
+            // Set column widths
+            ws_summary['!cols'] = [
+                {wch: 10}, // CLO
+                {wch: 50}, // Mô tả
+                {wch: 20}, // Kỳ vọng
+                {wch: 20}, // SV có đủ dữ liệu
+                {wch: 15}, // SV đạt
+                {wch: 20}, // Tỷ lệ đạt kỳ vọng
+                {wch: 20}, // Tỷ lệ TB lớp
+                {wch: 15}  // Kết luận
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws_summary, 'Tổng hợp CLO');
+
+            // SHEET 2: Chi tiết từng sinh viên
+            const detailData = [
+                // Header
+                ['MSSV', 'Họ và tên', ...appData.cloList.map(clo => `${clo.code} (Tỷ lệ đạt %)`), 'Tổng CLO đạt', 'Ghi chú'],
+                // Data rows
+                ...appData.students.map(student => {
+                    const totalCLOAchieved = appData.cloList.filter(clo => 
+                        student.cloResults[clo.code].ketLuan === 'Đạt'
+                    ).length;
+                    
+                    const missingCLOs = appData.cloList.filter(clo =>
+                        student.cloResults[clo.code].ketLuan === 'Chưa đủ dữ liệu'
+                    ).map(clo => clo.code);
+                    
+                    const note = missingCLOs.length > 0 
+                        ? `Thiếu dữ liệu: ${missingCLOs.join(', ')}`
+                        : '';
+                    
+                    return [
+                        student.mssv,
+                        student.hoTen,
+                        ...appData.cloList.map(clo => {
+                            const result = student.cloResults[clo.code];
+                            return result.tyLeDat !== null ? result.tyLeDat.toFixed(1) : 'N/A';
+                        }),
+                        `${totalCLOAchieved}/${appData.cloList.length}`,
+                        note
+                    ];
+                })
+            ];
+
+            const ws_detail = XLSX.utils.aoa_to_sheet(detailData);
+            
+            // Set column widths
+            ws_detail['!cols'] = [
+                {wch: 12}, // MSSV
+                {wch: 25}, // Họ tên
+                ...appData.cloList.map(() => ({wch: 15})), // CLO columns
+                {wch: 15}, // Tổng CLO đạt
+                {wch: 30}  // Ghi chú
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws_detail, 'Chi tiết sinh viên');
+
+            // SHEET 3: Ma trận CLO-Assessment
+            const matrixData = [
+                ['MA TRẬN CLO - BÀI ĐÁNH GIÁ'],
+                [''],
+                ['Bài đánh giá', ...appData.cloList.map(clo => `${clo.code} (Kỳ vọng ${clo.expectation}%)`)],
+                ...appData.assessments.map(assess => [
+                    `${assess.code} - ${assess.name}`,
+                    ...appData.cloList.map(clo => {
+                        const weight = appData.matrix[assess.code][clo.code];
+                        return weight > 0 ? `${weight}%` : '-';
+                    })
+                ]),
+                ['Tổng', ...appData.cloList.map(clo => {
+                    const sum = appData.assessments.reduce((total, assess) => 
+                        total + (parseFloat(appData.matrix[assess.code][clo.code]) || 0), 0);
+                    return `${sum.toFixed(1)}%`;
+                })]
+            ];
+
+            const ws_matrix = XLSX.utils.aoa_to_sheet(matrixData);
+            
+            // Set column widths
+            ws_matrix['!cols'] = [
+                {wch: 30}, // Bài đánh giá
+                ...appData.cloList.map(() => ({wch: 15})) // CLO columns
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws_matrix, 'Ma trận');
+
+            // SHEET 4: Phân tích chi tiết từng CLO
+            appData.cloList.forEach(clo => {
+                const cloDetail = [
+                    [`PHÂN TÍCH CHI TIẾT ${clo.code}`],
+                    [''],
+                    ['Mô tả:', appData.cloList.find(c => c.code === clo.code).description],
+                    ['Kỳ vọng tỷ lệ đạt:', `${summary[clo.code].kyVong}%`],
+                    [''],
+                    ['MSSV', 'Họ tên', 'Tỷ lệ đạt (%)', 'Kết luận', 'Chi tiết các bài'],
+                    ...appData.students.map(student => {
+                        const result = student.cloResults[clo.code];
+                        let chiTiet = '';
+                        if (result.ketLuan !== 'Chưa đủ dữ liệu') {
+                            chiTiet = result.chiTiet.map(ct => 
+                                `${ct.bai}: ${ct.diem !== null ? ct.diem.toFixed(1) : 'N/A'} ${ct.dat ? '✓' : '✗'} (${ct.trongSo}%)`
+                            ).join('; ');
+                        } else {
+                            chiTiet = `Thiếu điểm: ${result.missingData.join(', ')}`;
+                        }
+                        
+                        return [
+                            student.mssv,
+                            student.hoTen,
+                            result.tyLeDat !== null ? result.tyLeDat.toFixed(1) : 'N/A',
+                            result.ketLuan,
+                            chiTiet
+                        ];
+                    })
+                ];
+
+                const ws_clo = XLSX.utils.aoa_to_sheet(cloDetail);
+                
+                // Set column widths
+                ws_clo['!cols'] = [
+                    {wch: 12}, // MSSV
+                    {wch: 25}, // Họ tên
+                    {wch: 15}, // Tỷ lệ đạt
+                    {wch: 15}, // Kết luận
+                    {wch: 60}  // Chi tiết
+                ];
+
+                XLSX.utils.book_append_sheet(wb, ws_clo, clo.code);
+            });
+
+            // Tạo tên file
+            const fileName = `KetQua_CLO_${appData.thongTin.maHP || 'HP'}_${appData.thongTin.lopHP || 'Lop'}.xlsx`;
+            
+            XLSX.writeFile(wb, fileName);
+            showAlert('Đã xuất Excel thành công!', 'success');
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('cloAppData', JSON.stringify(appData));
+                showAlert('Đã lưu dữ liệu!', 'success');
+            } catch (error) {
+                showAlert('Lỗi khi lưu: ' + error.message, 'danger');
+            }
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('cloAppData');
+                if (saved) {
+                    appData = JSON.parse(saved);
+                    
+                    // Restore form values
+                    if (appData.thongTin) {
+                        document.getElementById('maHP').value = appData.thongTin.maHP || '';
+                        document.getElementById('tenHP').value = appData.thongTin.tenHP || '';
+                        document.getElementById('lopHP').value = appData.thongTin.lopHP || '';
+                        document.getElementById('hocKy').value = appData.thongTin.hocKy || '1';
+                        document.getElementById('namHoc').value = appData.thongTin.namHoc || '';
+                        document.getElementById('nganh').value = appData.thongTin.nganh || '';
+                        document.getElementById('khoa').value = appData.thongTin.khoa || '';
+                        document.getElementById('giangVien').value = appData.thongTin.giangVien || '';
+                    }
+                    
+                    renderCLOList();
+                    renderAssessmentList();
+                    renderMatrix();
+                    renderScoreTable();
+                    displayResults();
+                    
+                    showAlert('Đã tải dữ liệu!', 'success');
+                } else {
+                    showAlert('Không tìm thấy dữ liệu đã lưu!', 'info');
+                }
+            } catch (error) {
+                showAlert('Lỗi khi tải: ' + error.message, 'danger');
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '10000';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.style.transition = 'opacity 0.3s';
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize
+        window.onload = function() {
+            // Try to load saved data
+            const saved = localStorage.getItem('cloAppData');
+            if (saved) {
+                const shouldLoad = confirm('Phát hiện dữ liệu đã lưu. Bạn có muốn tải lại không?');
+                if (shouldLoad) {
+                    loadData();
+                }
+            }
+        };
+    </script>
+</body>
+</html>
