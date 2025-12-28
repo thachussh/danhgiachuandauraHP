@@ -628,7 +628,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Mã học phần:</label>
-                    <input type="text" id="maHP" placeholder="VD: SPHN123456">
+                    <input type="text" id="maHP" placeholder="VD: BCH123456">
                 </div>
                 <div class="form-group">
                     <label>Tên học phần:</label>
@@ -636,7 +636,7 @@
                 </div>
                 <div class="form-group">
                     <label>Lớp học phần:</label>
-                    <input type="text" id="lopHP" placeholder="VD: SPHN123456_01">
+                    <input type="text" id="lopHP" placeholder="VD: BCH123456L01">
                 </div>
                 <div class="form-group">
                     <label>Học kỳ:</label>
@@ -648,7 +648,7 @@
                 </div>
                 <div class="form-group">
                     <label>Năm học:</label>
-                    <input type="text" id="namHoc" placeholder="VD: 2024-2025">
+                    <input type="text" id="namHoc" placeholder="VD: 2025-2026">
                 </div>
                 <div class="form-group">
                     <label>Ngành đào tạo:</label>
@@ -656,7 +656,7 @@
                 </div>
                 <div class="form-group">
                     <label>Khóa tuyển sinh:</label>
-                    <input type="text" id="khoa" placeholder="VD: 2023">
+                    <input type="text" id="khoa" placeholder="VD: 2025">
                 </div>
                 <div class="form-group">
                     <label>Giảng viên:</label>
@@ -885,7 +885,7 @@
                 // Đợi DOM render xong rồi mới gọi renderMatrix
                 setTimeout(() => {
                     renderMatrix();
-                }, 50);
+                }, 100);
             }
             if (index === 4) {
                 setTimeout(() => {
@@ -945,6 +945,9 @@
             });
 
             renderCLOList();
+            if (isMatrixTabActive()) {
+                renderMatrix();
+            }
             
             // Clear inputs
             document.getElementById('cloCode').value = '';
@@ -985,6 +988,9 @@
             if (confirm('Xác nhận xóa CLO này?')) {
                 appData.cloList.splice(index, 1);
                 renderCLOList();
+                if (isMatrixTabActive()) {
+                    renderMatrix();
+                }
                 showAlert('Đã xóa CLO!', 'info');
             }
         }
@@ -1058,6 +1064,9 @@
             });
 
             renderAssessmentList();
+            if (isMatrixTabActive()) {
+                renderMatrix();
+            }
             
             // Clear inputs
             document.getElementById('assessCode').value = '';
@@ -1100,23 +1109,51 @@
             if (confirm('Xác nhận xóa bài đánh giá này?')) {
                 appData.assessments.splice(index, 1);
                 renderAssessmentList();
+                if (isMatrixTabActive()) {
+                    renderMatrix();
+                }
                 showAlert('Đã xóa bài đánh giá!', 'info');
             }
         }
 
+        // Helper function to check if matrix tab is active
+        function isMatrixTabActive() {
+            return document.querySelectorAll('.tab-content')[3].classList.contains('active');
+        }
+
         // Render Matrix
+        let renderMatrixRetryCount = 0;
+        const MAX_RENDER_RETRIES = 10;
+        
         function renderMatrix() {
             // Kiểm tra DOM elements tồn tại
             const header = document.getElementById('matrixHeader');
             const body = document.getElementById('matrixBody');
             const footer = document.getElementById('matrixFooter');
+            const table = document.getElementById('matrixTable');
             
-            if (!header || !body || !footer) {
-                console.error('Matrix DOM elements not found! Retrying...');
-                // Thử lại sau 100ms
-                setTimeout(renderMatrix, 100);
-                return;
+            if (!header || !body || !footer || !table) {
+                console.error('Matrix DOM elements not found! Retrying...', renderMatrixRetryCount);
+                
+                // Giới hạn số lần retry để tránh vòng lặp vô hạn
+                if (renderMatrixRetryCount < MAX_RENDER_RETRIES) {
+                    renderMatrixRetryCount++;
+                    setTimeout(renderMatrix, 200);
+                    return;
+                } else {
+                    console.error('Max retries reached. Giving up.');
+                    renderMatrixRetryCount = 0; // Reset counter
+                    
+                    // Hiển thị lỗi cho người dùng
+                    if (table) {
+                        table.innerHTML = '<tr><td colspan="100%" style="text-align:center; padding:30px; color: #e74c3c;">Lỗi: Không thể tải ma trận. Vui lòng F5 (refresh) trang.</td></tr>';
+                    }
+                    return;
+                }
             }
+            
+            // Reset retry counter khi thành công
+            renderMatrixRetryCount = 0;
 
             // Debug: kiểm tra dữ liệu
             if (appData.cloList.length === 0 || appData.assessments.length === 0) {
@@ -1133,7 +1170,7 @@
                         </div>
                     </td></tr>
                 `;
-                document.getElementById('matrixTable').innerHTML = debugMsg;
+                table.innerHTML = debugMsg;
                 return;
             }
 
@@ -2032,6 +2069,15 @@ ${JSON.stringify(appData, null, 2)}
                     loadData();
                 }
             }
+
+            // Setup MutationObserver for matrix tab
+            const matrixTabContent = document.querySelectorAll('.tab-content')[3];
+            const observer = new MutationObserver(() => {
+                if (matrixTabContent.classList.contains('active')) {
+                    renderMatrix();
+                }
+            });
+            observer.observe(matrixTabContent, { attributes: true, attributeFilter: ['class'] });
         };
     </script>
 </body>
